@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Auto-Cycle</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .timer-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .timer-display {
+      font-size: 64px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      color: #1976d2;
+      margin-bottom: 1rem;
+      letter-spacing: 4px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 1rem;
+      font-size: 14px;
+    }
+
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status-active {
+      background: #4caf50;
+      animation: pulse 2s infinite;
+    }
+
+    .status-paused {
+      background: #999;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .current-section {
+      background: #f1f8f4;
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .current-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #2e7d32;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .current-name {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+    }
+
+    .current-url {
+      font-size: 11px;
+      color: #666;
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+    }
+
+    .info-box {
+      background: #fff3e0;
+      border-left: 4px solid #ff9800;
+      padding: 1rem;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #e65100;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 2rem;
+    }
+
+    .control-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      color: #1a1a1a;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .control-btn:hover {
+      background: #f5f5f5;
+      border-color: #ccc;
+    }
+
+    .control-btn:active {
+      transform: scale(0.98);
+    }
+
+    .settings {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 1rem;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .settings label {
+      font-size: 13px;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    .settings input {
+      width: 60px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .settings button {
+      padding: 8px 16px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .settings button:hover {
+      background: #f5f5f5;
+      border-color: #ccc;
+    }
+
+    .notification {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #1976d2;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 14px;
+      z-index: 1000;
+      max-width: 400px;
+    }
+
+    .notification.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <div class="header">
+      <div class="title">Dashboard Auto-Cycle</div>
+      <div class="subtitle">Opens one dashboard at a time, every minute</div>
+    </div>
+
+    <div class="info-box">
+      📋 One tab opens at a time. After 1 minute it closes and opens the next dashboard.
+    </div>
+
+    <div class="timer-section">
+      <div class="timer-display" id="timer">01:00</div>
+      <div class="status">
+        <span class="status-indicator" id="status-indicator"></span>
+        <span id="status-text">Running</span>
+      </div>
+    </div>
+
+    <div class="current-section">
+      <div class="current-label">Now Opening</div>
+      <div class="current-name" id="current-name">Grafana</div>
+      <div class="current-url" id="current-url">https://osho-monitoring.oshochemical.net/...</div>
+    </div>
+
+    <div class="controls">
+      <button class="control-btn" id="play-pause-btn" onclick="togglePlayPause()">Pause</button>
+      <button class="control-btn" onclick="reset()">Reset</button>
+      <button class="control-btn" onclick="openNow()">Open Now</button>
+    </div>
+
+    <div class="settings">
+      <label for="interval-input">Interval (min)</label>
+      <input type="number" id="interval-input" min="1" max="120" value="1" onchange="updateInterval()">
+      <button onclick="updateInterval()">Update</button>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+  const dashboards = [
+    { 
+      name: 'Overal Site Summary', 
+      url: 'https://osho-monitoring.oshochemical.net/d/be8rdid54vtogd/overal-site-summary?autofitpanels&orgId=1&refresh=10s'
+    },
+{ 
+      name: 'Prometheus Node Status', 
+      url: 'http://192.168.250.196:9090/targets?search='
+    },
+    { 
+      name: 'Desk365 - Agent Portal', 
+      url: 'https://helpdeskosho.desk365.io/app/gp-home'
+    }
+  ];
+
+  let currentIndex = 0;
+  let intervalMinutes = 1;
+  let timeRemaining = intervalMinutes * 60;
+  let isPlaying = true;
+  let timerInterval = null;
+  let currentWindow = null;
+
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    
+    timerInterval = setInterval(() => {
+      if (isPlaying) {
+        timeRemaining--;
+        updateDisplay();
+
+        if (timeRemaining <= 0) {
+          cycleDashboard();
+          timeRemaining = intervalMinutes * 60;
+        }
+      }
+    }, 1000);
+  }
+
+  function cycleDashboard() {
+    // Close current window
+    if (currentWindow) {
+      try {
+        currentWindow.close();
+      } catch (e) {
+        console.log('Could not close window');
+      }
+    }
+
+    // Move to next dashboard
+    currentIndex = (currentIndex + 1) % dashboards.length;
+
+    // Open next dashboard
+    openCurrentDashboard();
+  }
+
+  function openCurrentDashboard() {
+    const dashboard = dashboards[currentIndex];
+    currentWindow = window.open(dashboard.url, 'dashboard-window');
+    render();
+    showNotification(`Opened: ${dashboard.name}`);
+  }
+
+  function openNow() {
+    if (currentWindow) {
+      try {
+        currentWindow.close();
+      } catch (e) {
+        console.log('Could not close window');
+      }
+    }
+    openCurrentDashboard();
+    reset();
+  }
+
+  function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 3000);
+  }
+
+  function updateDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    document.getElementById('timer').textContent = 
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function togglePlayPause() {
+    isPlaying = !isPlaying;
+    const btn = document.getElementById('play-pause-btn');
+    const indicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
+    
+    if (isPlaying) {
+      btn.textContent = 'Pause';
+      indicator.className = 'status-indicator status-active';
+      statusText.textContent = 'Running';
+    } else {
+      btn.textContent = 'Resume';
+      indicator.className = 'status-indicator status-paused';
+      statusText.textContent = 'Paused';
+      
+      // Close current window when paused
+      if (currentWindow) {
+        try {
+          currentWindow.close();
+        } catch (e) {
+          console.log('Could not close window');
+        }
+        currentWindow = null;
+      }
+    }
+  }
+
+  function updateInterval() {
+    const input = document.getElementById('interval-input');
+    const newInterval = Math.max(1, Math.min(120, parseInt(input.value) || 1));
+    input.value = newInterval;
+    intervalMinutes = newInterval;
+    reset();
+  }
+
+  function reset() {
+    timeRemaining = intervalMinutes * 60;
+    updateDisplay();
+  }
+
+  function render() {
+    const dashboard = dashboards[currentIndex];
+    document.getElementById('current-name').textContent = dashboard.name;
+    document.getElementById('current-url').textContent = dashboard.url;
+  }
+
+  // Start on load
+  render();
+  startTimer();
+  openCurrentDashboard();
+</script>
+
+</body>
+</html>
