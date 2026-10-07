@@ -410,8 +410,8 @@
 
     <div class="current-section">
       <div class="current-label">Now Open</div>
-      <div class="current-name" id="current-name">Prometheus Node Status</div>
-      <div class="current-url" id="current-url">http://192.168.250.196:9090/targets?search=</div>
+      <div class="current-name" id="current-name">Overal Site Summary</div>
+      <div class="current-url" id="current-url">https://osho-monitoring.oshochemical.net/...</div>
     </div>
 
     <div class="controls">
@@ -433,7 +433,10 @@
 
 <script>
   const dashboards = [
-
+    { 
+      name: 'Overal Site Summary', 
+      url: 'https://osho-monitoring.oshochemical.net/d/be8rdid54vtogd/overal-site-summary?autofitpanels&orgId=1&refresh=10s'
+    },
     { 
       name: 'Prometheus Node Status', 
       url: 'http://192.168.250.196:9090/targets?search='
@@ -441,6 +444,18 @@
     { 
       name: 'Desk365 - Agent Portal', 
       url: 'https://helpdeskosho.desk365.io/app/gp-home'
+    },
+    { 
+      name: 'Microsoft Defender', 
+      url: 'https://security.microsoft.com/homepage?tid=602e0af9-58c1-4623-a665-6614e471af83'
+    },
+    { 
+      name: 'FortiSASE - Monitoring', 
+      url: 'https://portal.prod.fortisase.com/portal/monitoring/1'
+    },
+    { 
+      name: 'SOCaaS - Monitoring Overview', 
+      url: 'https://socaas.mss.fortinet.com/socaas/cli_out/#/sec/dashboard/overview'
     }
   ];
 
